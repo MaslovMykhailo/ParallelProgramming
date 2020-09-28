@@ -32,7 +32,13 @@ public class CPUProcessFlow extends Thread {
 
     public void run() {
         while (processAmount > 0) {
-            cpu.execute(generateProcess());
+            CPUProcess process = generateProcess();
+            System.out.println("Generated process " +  flowId + "-" + process.getExecutionTime());
+            try {
+                cpu.execute(process);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             processAmount--;
         }
     }
