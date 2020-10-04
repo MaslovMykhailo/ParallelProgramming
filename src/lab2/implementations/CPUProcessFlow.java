@@ -2,7 +2,7 @@ package lab2.implementations;
 
 import lab2.interfaces.Monitorable;
 import lab2.interfaces.ProcessFlowMonitor;
-import lab2.utils.Randomizer;
+import utils.Randomizer;
 
 import java.util.Optional;
 

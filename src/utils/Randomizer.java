@@ -1,4 +1,4 @@
-package lab2.utils;
+package utils;
 
 public class Randomizer {
 
