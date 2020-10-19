@@ -9,9 +9,14 @@ public class SemaphoreQueue {
 
     private final Semaphore mutex = new Semaphore(1);
 
-    private final Semaphore consumptionSemaphore = new Semaphore(0);
+    private final Semaphore consumptionSemaphore;
 
-    private final Semaphore productionSemaphore = new Semaphore(8);
+    private final Semaphore productionSemaphore;
+
+    public SemaphoreQueue(int capacity) {
+        consumptionSemaphore = new Semaphore(0);
+        productionSemaphore = new Semaphore(capacity);
+    }
 
     public void push(Task task) throws InterruptedException {
         productionSemaphore.acquire();
