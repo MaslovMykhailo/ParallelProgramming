@@ -1,7 +1,7 @@
 package lab4.ReadersWriters;
 
 import lab4.ReadersWriters.database.Database;
-import lab4.ReadersWriters.database.EqualityDatabase;
+import lab4.ReadersWriters.database.PrivilegedDatabase;
 import lab4.ReadersWriters.interfaces.Readable;
 import lab4.ReadersWriters.interfaces.Writable;
 import utils.Pair;
@@ -21,8 +21,8 @@ public class Main {
     private static final Pair<Integer, Integer> WRITING_TIME = Pair.create(50, 100);
 
     public static void main(String... args) {
-        Database db = new EqualityDatabase();
-//        Database db = new PrivilegedDatabase();
+//        Database db = new EqualityDatabase();
+        Database db = new PrivilegedDatabase();
 
         List<Reader> readers = createReaders(db);
         List<Writer> writers = createWriters(db);

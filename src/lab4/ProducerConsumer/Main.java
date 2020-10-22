@@ -13,11 +13,19 @@ public class Main {
 
         SemaphoreQueue queue = new SemaphoreQueue(8);
 
-        Producer producer = new Producer(queue);
-        Consumer consumer = new Consumer(queue);
+        Producer producer1 = new Producer(queue);
+        Producer producer2 = new Producer(queue);
 
-        producer.start();
-        consumer.start();
+        Consumer consumer1 = new Consumer(queue);
+        Consumer consumer2 = new Consumer(queue);
+        Consumer consumer3 = new Consumer(queue);
+
+        producer1.start();
+        producer2.start();
+
+        consumer1.start();
+        consumer2.start();
+        consumer3.start();
 
     }
 

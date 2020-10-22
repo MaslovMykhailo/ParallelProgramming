@@ -39,13 +39,13 @@ public class Philosopher extends Thread {
     }
 
     private void pickUpFork(Fork fork) {
-        doAction(String.format("Philosopher %s picks up fork-%d", name, fork.getIndex()));
         fork.pickUp();
+        doAction(String.format("Philosopher %s picked up fork-%d", name, fork.getIndex()));
     }
 
     private void putDownFork(Fork fork) {
-        doAction(String.format("Philosopher %s puts down fork-%d", name, fork.getIndex()));
         fork.putDown();
+        doAction(String.format("Philosopher %s put down fork-%d", name, fork.getIndex()));
     }
 
     private static void doAction(String actionDescription) {
