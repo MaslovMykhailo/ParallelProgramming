@@ -10,6 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/*
+    Lab #4
+    Variant 3
+    Readers Writers problem
+    Synchronisation mechanism - ReentrantLock
+ */
+
 public class Main {
 
     private static final int READERS_COUNT = 3;

@@ -2,6 +2,13 @@ package lab4.DiningPhilosophers;
 
 import java.util.Arrays;
 
+/*
+    Lab #4
+    Variant 3
+    Dinning Philosophers problem
+    Synchronisation mechanism - ReentrantLock
+ */
+
 public class Main {
 
     private static final String[] philosopherNames = {
