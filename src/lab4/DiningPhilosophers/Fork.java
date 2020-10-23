@@ -9,7 +9,7 @@ public class Fork {
 
     private final Condition condition = lock.newCondition();
 
-    private boolean isBusy = false;
+    private volatile boolean isBusy = false;
 
     private final int index;
 
