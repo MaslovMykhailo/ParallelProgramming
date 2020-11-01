@@ -1,13 +1,17 @@
 package lab5;
 
+import utils.Pair;
 import utils.Randomizer;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -22,14 +26,20 @@ import java.util.stream.Stream;
 
 public class Main {
 
-    private static final int ARRAY_SIZE = 100;
+    private static final int ARRAY_1_SIZE = 100;
 
-    public static void main(String... args) {
+    private static final Pair<Integer, Integer> ARRAY_1_RANGE = Pair.create(0, 1000);
 
-        int[] result = Stream
+    private static final int ARRAY_2_SIZE = 100;
+
+    private static final Pair<Integer, Integer> ARRAY_2_RANGE = Pair.create(500, 1000);
+
+    public static void main(String... args) throws ExecutionException, InterruptedException {
+
+        List<int[]> listOfArrays = Stream
             .of(
                 CompletableFuture
-                    .supplyAsync(Main::createRandomArray)
+                    .supplyAsync(createRandomArray(ARRAY_1_SIZE, getRandomInteger(ARRAY_1_RANGE)))
                     .thenApplyAsync(log(array -> "Array1 create: " + Arrays.toString(array)))
                     .thenApplyAsync(Main::getArrayGreaterThanAverage)
                     .thenApplyAsync(log(array -> "Array1 filtered: " + Arrays.toString(array)))
@@ -37,7 +47,7 @@ public class Main {
                     .thenApplyAsync(log(array -> "Array1 sorted: " + Arrays.toString(array))),
 
                 CompletableFuture
-                    .supplyAsync(Main::createRandomArray)
+                    .supplyAsync(createRandomArray(ARRAY_2_SIZE, getRandomInteger(ARRAY_2_RANGE)))
                     .thenApplyAsync(log(array -> "Array2 create: " + Arrays.toString(array)))
                     .thenApplyAsync(Main::getArrayLessThanAverage)
                     .thenApplyAsync(log(array -> "Array2 filtered: " + Arrays.toString(array)))
@@ -45,21 +55,23 @@ public class Main {
                     .thenApplyAsync(log(array -> "Array2 sorted: " + Arrays.toString(array)))
             )
             .map(CompletableFuture::join)
-            .collect(mergeCollector);
+            .collect(Collectors.toList());
 
-        System.out.println("Result: " + Arrays.toString(result));
-
+        CompletableFuture
+            .supplyAsync(() -> mergeArrays(listOfArrays.get(0), listOfArrays.get(1)))
+            .thenApplyAsync(log(array -> "Result: " + Arrays.toString(array)))
+            .get();
     }
 
-    private static final Collector<int[], int[], int[]> mergeCollector = Collector.of(
-        () -> new int[]{},
-        Main::mergeArrays,
-        Main::mergeArrays,
-        Collector.Characteristics.UNORDERED
-    );
-
     private static int[] mergeArrays(int[] array1, int[] array2) {
-        return IntStream.concat(Arrays.stream(array1), Arrays.stream(array2)).distinct().toArray();
+        return Arrays
+            .stream(array1)
+            .distinct()
+            .filter(e1 -> Arrays
+                .stream(array2)
+                .anyMatch(e2 -> e1 == e2)
+            )
+            .toArray();
     }
 
     private static int[] sortArray(int[] array) {
@@ -87,12 +99,12 @@ public class Main {
         return Arrays.stream(array).reduce(0, Integer::sum) / array.length;
     }
 
-    private static int[] createRandomArray() {
-        return IntStream.range(0, ARRAY_SIZE).map(e -> getRandomInteger()).toArray();
+    private static Supplier<int[]> createRandomArray(int size, Supplier<Integer> nextInteger) {
+        return () -> IntStream.range(0, size).map(e -> nextInteger.get()).toArray();
     }
 
-    private static int getRandomInteger() {
-        return Randomizer.getInRange(0, ARRAY_SIZE);
+    private static Supplier<Integer> getRandomInteger(Pair<Integer, Integer> range) {
+        return () -> Randomizer.getInRange(range);
     }
 
     private static <T> UnaryOperator<T> log(Function<T, String> messageGetter) {
