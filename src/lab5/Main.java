@@ -4,14 +4,11 @@ import utils.Pair;
 import utils.Randomizer;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -34,9 +31,8 @@ public class Main {
 
     private static final Pair<Integer, Integer> ARRAY_2_RANGE = Pair.create(500, 1000);
 
-    public static void main(String... args) throws ExecutionException, InterruptedException {
-
-        List<int[]> listOfArrays = Stream
+    public static void main(String... args) {
+        Stream
             .of(
                 CompletableFuture
                     .supplyAsync(createRandomArray(ARRAY_1_SIZE, getRandomInteger(ARRAY_1_RANGE)))
@@ -54,13 +50,20 @@ public class Main {
                     .thenApplyAsync(Main::sortArray)
                     .thenApplyAsync(log(array -> "Array2 sorted: " + Arrays.toString(array)))
             )
-            .map(CompletableFuture::join)
-            .collect(Collectors.toList());
-
-        CompletableFuture
-            .supplyAsync(() -> mergeArrays(listOfArrays.get(0), listOfArrays.get(1)))
+            .reduce(Main::mergeArrays)
+            .get()
             .thenApplyAsync(log(array -> "Result: " + Arrays.toString(array)))
-            .get();
+            .join();
+    }
+
+    private static CompletableFuture<int[]> mergeArrays(
+        CompletableFuture<int[]> futureArray1,
+        CompletableFuture<int[]> futureArray2
+    ) {
+        return CompletableFuture.supplyAsync(() -> mergeArrays(
+            futureArray1.join(),
+            futureArray2.join()
+        ));
     }
 
     private static int[] mergeArrays(int[] array1, int[] array2) {
